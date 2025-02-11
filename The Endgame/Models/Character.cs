@@ -42,7 +42,7 @@ public class Character
         }
     }
 
-    private string _chooseTarget(List<Character> enemies)
+    private Character _chooseTarget(List<Character> enemies)
     {
         Console.WriteLine("Choose target: ");
         for (int i = 0; i < enemies.Count; i++)
@@ -56,7 +56,7 @@ public class Character
 
             if (choice >= 0 && choice < enemies.Count)
             {
-                return enemies[choice].name;
+                return enemies[choice];
             }
             Console.WriteLine("Please enter a valid choice.");
         }
@@ -69,8 +69,7 @@ public class Character
         
         if (choice is ActionType.Attack)
         {
-            // TODO: implement selecting a specific enemy
-            string target = _chooseTarget(enemies);
+            Character target = _chooseTarget(enemies);
             attack.Execute(name, target);
         }
         else
@@ -83,8 +82,13 @@ public class Character
     // TODO: perhaps there is a better way to pass enemies (recheck when selection of enemy is implemented)
     public void Do(List<Character> enemies)
     {
-        if (role == Role.ai) attack.Execute(name, enemies[0].name);
+        if (role == Role.ai) attack.Execute(name, enemies[0]);
         else _playerChoosesAction(enemies);
+    }
+
+    public void changeHP(int hpChange)
+    {
+        currentHP = Math.Max(0, currentHP + hpChange);
     }
 }
 
