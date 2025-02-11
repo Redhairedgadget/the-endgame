@@ -8,12 +8,12 @@ Console.WriteLine("Welcome to The Endgame!");
 var heroes = new List<Character>();
 Console.WriteLine("What is your name? ");
 var name = Console.ReadLine();
-var player = new Character(name, Role.player);
+var player = new Character(name, Role.player, 25);
 heroes.Add(player);
 
 // Create monsters party
 var monsters = new List<Character>();
-var skeleton = new Character("Skeleton", Role.ai);
+var skeleton = new Character("Skeleton", Role.ai, 5);
 monsters.Add(skeleton);
 
 Console.WriteLine($"Two characters were created:  {player.name}, {skeleton.name}.");

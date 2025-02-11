@@ -4,43 +4,32 @@ using Utils;
 
 public class Character
 {
+    // TODO: characters should have unique ID, as name could be repeated
     public string name { get; private set; }
     private Role role;
+    public int maxHP { get; private set; }
+    public int currentHP { get; private set; }
     public TargetlessAction pass { get; private set; }
     public TargetedAction attack { get; private set; }
     
-    // TODO: actions should be separate and depend on character's status
-    private Dictionary<int, ActionType> ACTION_DICT = new Dictionary<int, ActionType>()
-    {
-        {0, ActionType.Pass},
-        {1, ActionType.Attack}
-    };
-
+    // TODO: actions should be separate and depend on character's type
     private void _populateSkeletonActions()
     {
         pass = new Nothing();
         attack = new BoneCrunch();
-        // ACTION_DICT = new Dictionary<int, Action>()
-        // {
-        //     { 0, new Nothing() },
-        //     { 1, new BoneCrunch() },
-        // };
     }
 
     private void _populatePlayerActions()
     {
         pass = new Nothing();
         attack = new Punch();
-        // ACTION_DICT = new Dictionary<int, Action>()
-        // {
-        //     { 0, new Nothing() },
-        //     { 1, new Punch() },
-        // };
     }
-    public Character(string name, Role role)
+    public Character(string name, Role role, int hp)
     {
         this.name = name;
         this.role = role;
+        this.maxHP = hp;
+        this.currentHP = hp;
 
         switch (role)
         {
@@ -53,6 +42,26 @@ public class Character
         }
     }
 
+    private string _chooseTarget(List<Character> enemies)
+    {
+        Console.WriteLine("Choose target: ");
+        for (int i = 0; i < enemies.Count; i++)
+        {
+            Console.WriteLine($"{i}: {enemies[i].name}");
+        }
+
+        while (true)
+        {
+            int choice = Convert.ToInt32(Console.ReadLine());
+
+            if (choice >= 0 && choice < enemies.Count)
+            {
+                return enemies[choice].name;
+            }
+            Console.WriteLine("Please enter a valid choice.");
+        }
+    }
+
     private void _playerChoosesAction(List<Character> enemies)
     {
         Console.WriteLine("What would you like to do?");
@@ -61,7 +70,8 @@ public class Character
         if (choice is ActionType.Attack)
         {
             // TODO: implement selecting a specific enemy
-            attack.Execute(name, enemies[0].name);
+            string target = _chooseTarget(enemies);
+            attack.Execute(name, target);
         }
         else
         {
