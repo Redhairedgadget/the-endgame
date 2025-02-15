@@ -2,36 +2,47 @@ namespace The_Endgame.Models;
 
 public class Battle
 {
-    private List<Character> heroes;
-    private List<Character> monsters;
-    private int rounds;
+    private Party heroes;
+    private Party monsters;
+    // private int rounds;
+    private bool isOver;
 
-    public Battle(List<Character> heroes, List<Character> monsters, int rounds)
+    public Battle(Party heroes, Party monsters)
     {
         this.heroes = heroes;
         this.monsters = monsters;
-        this.rounds = rounds;
+        // this.rounds = rounds;
+        isOver = false;
     }
 
-    private void _runPartyTurn(List<Character> party, List<Character> enemies)
+    private void _runPartyTurn(Party party, Party enemies)
     {
-        foreach (var character in party)
+        foreach (var character in party.characters)
         { 
             Console.WriteLine($"It's {character.name}'s turn...");
             character.Do(enemies);
             Console.WriteLine("");
-            // Console.WriteLine($"{character.name} did {character.Do()}.\n");
+            
+            // Check if party still exists
+            if (enemies.partySize == 0)
+            {
+                isOver = true;
+                Console.WriteLine($"{enemies.partyName} has been defeated. {party.partyName} have won!");
+                break;
+            }
         }
     }
 
     public void Run()
     {
-        while (rounds > 0)
+        bool heroesTurn = true;
+        while (!isOver)
         {
-            _runPartyTurn(heroes, monsters);
-            _runPartyTurn(monsters, heroes);
+            if (heroesTurn) _runPartyTurn(heroes, monsters);
+            else _runPartyTurn(monsters, heroes);
             
-            rounds--;
+            heroesTurn = !heroesTurn;
+            // rounds--;
         }
     }
 }

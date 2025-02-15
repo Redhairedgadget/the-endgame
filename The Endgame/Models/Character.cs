@@ -12,34 +12,14 @@ public class Character
     public TargetlessAction pass { get; private set; }
     public TargetedAction attack { get; private set; }
     
-    // TODO: actions should be separate and depend on character's type
-    private void _populateSkeletonActions()
-    {
-        pass = new Nothing();
-        attack = new BoneCrunch();
-    }
-
-    private void _populatePlayerActions()
-    {
-        pass = new Nothing();
-        attack = new Punch();
-    }
-    public Character(string name, Role role, int hp)
+    public Character(string name, Role role, int hp, Attack attack)
     {
         this.name = name;
         this.role = role;
         this.maxHP = hp;
         this.currentHP = hp;
-
-        switch (role)
-        {
-            case Role.player:
-                _populatePlayerActions();
-                break;
-            case Role.ai:
-                _populateSkeletonActions();
-                break;
-        }
+        this.pass = new Nothing();
+        this.attack = attack;
     }
 
     private Character _chooseTarget(List<Character> enemies)
@@ -62,27 +42,35 @@ public class Character
         }
     }
 
-    private void _playerChoosesAction(List<Character> enemies)
+    private void _playerChoosesAction(Party enemies)
     {
         Console.WriteLine("What would you like to do?");
         ActionType choice = Utils.SelectEnum<ActionType>();
         
         if (choice is ActionType.Attack)
         {
-            Character target = _chooseTarget(enemies);
-            attack.Execute(name, target);
+            Character target = _chooseTarget(enemies.characters);
+            bool enemyDead = attack.Execute(name, target);
+            if (enemyDead) enemies.Remove(target);
         }
         else
         {
             pass.Execute(name);
         }
-
     }
     
     // TODO: perhaps there is a better way to pass enemies (recheck when selection of enemy is implemented)
-    public void Do(List<Character> enemies)
+    public void Do(Party enemies)
     {
-        if (role == Role.ai) attack.Execute(name, enemies[0]);
+        // TODO: this will need to be outsourced in its own function during ai implementation
+        
+        // Choose attacks and propagate effects on targets
+        if (role == Role.ai)
+        {
+            Character firstCharacter = enemies.characters[0];
+            bool charDead = attack.Execute(name, firstCharacter);
+            if (charDead) enemies.Remove(firstCharacter);
+        }
         else _playerChoosesAction(enemies);
     }
 
